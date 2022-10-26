@@ -1,0 +1,6 @@
+{"Time":"2022-10-26T17:12:32.392229+01:00","Action":"run","Package":"main/v2","Test":"TestMain"}
+{"Time":"2022-10-26T17:12:32.392397+01:00","Action":"output","Package":"main/v2","Test":"TestMain","Output":"=== RUN   TestMain\n"}
+{"Time":"2022-10-26T17:12:32.392411+01:00","Action":"output","Package":"main/v2","Test":"TestMain","Output":"--- PASS: TestMain (0.00s)\n"}
+{"Time":"2022-10-26T17:12:32.392413+01:00","Action":"pass","Package":"main/v2","Test":"TestMain","Elapsed":0}
+{"Time":"2022-10-26T17:12:32.392419+01:00","Action":"run","Package":"main/v2","Test":"Test_SomethingElse"}
+{"Time":"2022-10-26T17:12:32.392421+01:00","Action":"output","Package":"main/v2","Test":"Test_SomethingElse","Output":"=== RUN   Test_SomethingElse\n"}

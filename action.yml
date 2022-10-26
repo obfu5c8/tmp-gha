@@ -1,0 +1,62 @@
+name: "Go Test"
+description: |
+  Use gotestfmt to format `go test` output better
+
+inputs:
+  dir:
+    description: |
+      Directory to execute test command in.
+      Defaults to current working directory
+    required: false
+
+  testCmd:
+    description: |
+      Command to execute to generate test results.
+      Usually this would be something like `go test -json ./...`
+      If a testCmd is specified then none of the other configuration
+      options will be considered, and it is up to the user to ensure
+      that the output of the command is valid `go test` json output.
+
+  name:
+    description: Test run name
+    required: false
+    default: Tests
+
+  outputJson:
+    description: Optional file path to write raw test results json to
+    required: false
+
+  summarize:
+    description: |
+      Level of detail to show in summary. Can be one of [ all | failed | not-passed ]. 
+      Defaults to 'all'
+    required: false
+    default: all
+
+  packages:
+    description: "Packages to run"
+    required: false
+    default: "./..."
+
+  coverage:
+    description: Calculate test coverage
+    default: "false"
+
+  token:
+    description: github token
+    required: true
+
+outputs:
+  testResultsJsonFile: # id of output
+    description: |
+      Path to a file containing the json test results that
+      were passed to formatters, in case you want to do 
+      further processing on them
+
+runs:
+  using: "node16"
+  main: "./lib/action.js"
+
+branding:
+  icon: list
+  color: orange
