@@ -25,16 +25,16 @@ jobs:
           yarn install --immutable
           yarn build
 
-      - name: Add source tag
-        uses: actions/github-script@v5
-        with:
-          script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/sources/${{ env.GITHUB_REF_NAME }}',
-              sha: context.sha
-            })
+      # - name: Add source tag
+      #   uses: actions/github-script@v5
+      #   with:
+      #     script: |
+      #       github.rest.git.createRef({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         ref: 'refs/tags/sources/${{ env.GITHUB_REF_NAME }}',
+      #         sha: context.sha
+      #       })
 
       - uses: JasonEtco/build-and-tag-action@v2
         with:
