@@ -20,24 +20,24 @@ jobs:
         run: |
           env
 
-      # - name: Install deps and build
-      #   run: |
-      #     yarn install --immutable
-      #     yarn build
+      - name: Install deps and build
+        run: |
+          yarn install --immutable
+          yarn build
 
-      # - name: Add source tag
-      #   uses: actions/github-script@v5
-      #   with:
-      #     script: |
-      #       github.rest.git.createRef({
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         ref: 'refs/tags/sources/<tagname>',
-      #         sha: context.sha
-      #       })
+      - name: Add source tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/sources/${{ env.GITHUB_REF_NAME }}',
+              sha: context.sha
+            })
 
-      # - uses: JasonEtco/build-and-tag-action@v2
-      #   with:
-      #     tag_name: v0.0.1
-      #   env:
-      #     GITHUB_TOKEN: ${{ github.token }}
+      - uses: JasonEtco/build-and-tag-action@v2
+        with:
+          tag_name: ${{ env.GITHUB_REF_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
