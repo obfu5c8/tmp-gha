@@ -39,11 +39,11 @@ export class ExternalProcessDuplex extends Duplex {
     private _stdout?: Readable;
 
     /** Has the process exited? */
-    private _exited: boolean = true;
+    private _exited = true;
     /** Was the process killed? */
     private _killed: boolean | null = false;
     /** Has the stream ended? */
-    private _ended: boolean = false;
+    private _ended = false;
 
     /** Last error generated  */
     private _ex?: any;
@@ -172,7 +172,7 @@ export class ExternalProcessDuplex extends Duplex {
                 "Command failed: " +
                     Buffer.concat(this._stderrChunks).toString("utf8")
             ));
-            ex.killed = this._process!!.killed || this._killed;
+            ex.killed = this._process!.killed || this._killed;
             ex.code = code;
             ex.signal = signal;
             this.emit("error", ex);
@@ -187,13 +187,13 @@ export class ExternalProcessDuplex extends Duplex {
      * @param cb
      */
     private _kill = (cb: () => void) => {
-        this._stdout!!.destroy();
-        this._stderr!!.destroy();
+        this._stdout!.destroy();
+        this._stderr!.destroy();
 
         this._killed = true;
 
         try {
-            this._process!!.kill(
+            this._process!.kill(
                 (this._options && this._options.killSignal) || "SIGTERM"
             );
         } catch (err) {
