@@ -6,6 +6,14 @@ import { spawnStreamDuplex } from "./util/stream-helpers";
 
 
 
+
+
+
+
+
+
+
+
 export const spawnBashCommand = (cmd: string, opts: SpawnOptionsWithoutStdio): MultiOutputCommand => new MultiOutputCommand(cmd, opts)
 
 
