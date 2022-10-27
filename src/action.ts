@@ -52,6 +52,7 @@ export async function executeAction(inputs: ActionInputs) {
     // const gh = github.getOctokit(config.githubToken, {
     //     userAgent: 'wetransfer/gh-action-go-test'
     // })
+    //
 
     //==< Mark the test check as starting >=================|
     // const check = await gh.rest.checks.create({
