@@ -1,11 +1,11 @@
 {
     "name": "@wetransfer/ghaction-gotestfmt",
     "version": "0.0.1",
-    "main": "index.js",
+    "main": "dist/index.js",
     "license": "MIT",
     "scripts": {
         "prepare": "husky install",
-        "build": "webpack",
+        "build": "ncc build ./src/entrypoint.ts -o ./dist --minify",
         "watch": "webpack --watch",
         "lint": "eslint ./src --fix"
     },
@@ -27,6 +27,7 @@
         "@types/readable-stream": "^2.3.14",
         "@typescript-eslint/eslint-plugin": "^5.41.0",
         "@typescript-eslint/parser": "^5.41.0",
+        "@vercel/ncc": "^0.34.0",
         "eslint": "^8.26.0",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-prettier": "^4.2.1",

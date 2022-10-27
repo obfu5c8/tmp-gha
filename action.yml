@@ -1,4 +1,4 @@
-name: "Go Test"
+name: 'Go Test'
 description: |
   Use gotestfmt to format `go test` output better
 
@@ -34,13 +34,13 @@ inputs:
     default: all
 
   packages:
-    description: "Packages to run"
+    description: 'Packages to run'
     required: false
-    default: "./..."
+    default: './...'
 
   coverage:
     description: Calculate test coverage
-    default: "false"
+    default: 'false'
 
   token:
     description: github token
@@ -54,8 +54,8 @@ outputs:
       further processing on them
 
 runs:
-  using: "node16"
-  main: "./lib/action.js"
+  using: 'node16'
+  main: './dist/index.js'
 
 branding:
   icon: list
