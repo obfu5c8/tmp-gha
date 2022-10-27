@@ -1,0 +1,26 @@
+#!/bin/bash
+
+currentBranch=$(git rev-parse --abbrev-ref HEAD)
+if [ "$currentBranch" != "main" ]
+then
+    >&2 echo "ERROR: Can only release from main branch"
+    exit 1
+fi
+
+
+
+version="v1.0.0"
+
+sourceTag="source-$version"
+releaseTag="$version"
+
+
+## Tag the source
+git tag 
+
+
+branch="release-$tag"
+
+
+
+

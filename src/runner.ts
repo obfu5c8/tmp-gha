@@ -1,7 +1,13 @@
 import { spawn, SpawnOptionsWithoutStdio } from 'child_process';
+import es from 'event-stream';
 import { PassThrough, Readable, Writable } from 'stream';
 
-export const spawnBashCommand = (cmd: string, opts: SpawnOptionsWithoutStdio): MultiOutputCommand =>
+export const spawnBashCommand = (cmd: string, opts: SpawnOptionsWithoutStdio) => {
+    const proc = spawn('bash', ['-c', cmd], opts);
+    return es.child(proc);
+};
+
+export const spawnBashCommand2 = (cmd: string, opts: SpawnOptionsWithoutStdio): MultiOutputCommand =>
     new MultiOutputCommand(cmd, opts);
 
 class MultiOutputCommand {
