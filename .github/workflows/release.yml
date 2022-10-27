@@ -11,6 +11,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install deps and build
+        run: |
+          yarn install --immutable
+          yarn build
+
       - uses: JasonEtco/build-and-tag-action@v2
         with:
           tag_name: v0.0.1
