@@ -1,25 +1,19 @@
-
-
-
-
-
 export interface Config {
     /** The directory from which to execute testCmd */
-    testDir: string
+    testDir: string;
 
     /** The command to execute to output test results */
-    testCmd: string
+    testCmd: string;
 
     /** The display name of the test run */
-    displayName: string
+    displayName: string;
 
     /** Github auth token */
-    githubToken: string
+    githubToken: string;
 
     /** File to write json results to */
-    jsonOutputFile?: string
+    jsonOutputFile?: string;
 
     /** Amount of detail to show in summary */
-    summaryDetail: 'all' | 'failed' | 'not-passed'
+    summaryDetail: 'all' | 'failed' | 'not-passed';
 }
-

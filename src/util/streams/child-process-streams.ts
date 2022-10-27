@@ -1,6 +1,6 @@
-import { spawn, SpawnOptionsWithoutStdio } from "child_process";
-import duplexer2 from "duplexer2";
-import { Duplex, PassThrough, Readable } from "stream";
+import { spawn, SpawnOptionsWithoutStdio } from 'child_process';
+import duplexer2 from 'duplexer2';
+import { PassThrough, Readable } from 'stream';
 
 type ChildProcessStreamOpts = SpawnOptionsWithoutStdio & {
     onNonZeroExit?: (code: number, stderr: string, throwErr: (err: Error) => void) => void;
@@ -18,7 +18,7 @@ export function spawnChildProcessDuplex(cmd: string, arg1?: unknown, arg2?: unkn
     let args: string[] = [];
     let opts: ChildProcessStreamOpts;
     if (arg1 && Array.isArray(arg1)) {
-        args = arg1;
+        args = arg1 as string[];
         opts = arg2 as ChildProcessStreamOpts;
     } else {
         opts = arg1 as ChildProcessStreamOpts;
@@ -40,7 +40,7 @@ export function spawnChildProcessDuplex(cmd: string, arg1?: unknown, arg2?: unkn
 
     // Capture stderr to a buffer for error reporting
     const stdoutChunks: string[] = [];
-    proc.stdout.on("data", (chunk) => {
+    proc.stdout.on('data', (chunk: Buffer | string) => {
         stdoutChunks.push(chunk.toString());
     });
 
@@ -48,11 +48,11 @@ export function spawnChildProcessDuplex(cmd: string, arg1?: unknown, arg2?: unkn
     // error if it's not a 'good one'. This has to be left
     // up to the user since a non-zero exit code does not
     // always indicade an error.
-    proc.on("exit", (code, signal) => {
+    proc.on('exit', (code, signal) => {
         if (!signal && code && code != 0) {
-            if (opts && opts.onNonZeroExit) {
-                opts.onNonZeroExit(code, stdoutChunks.join(""), (err: Error) => {
-                    stream.emit("error", err);
+            if (onNonZeroExit) {
+                onNonZeroExit(code, stdoutChunks.join(''), (err: Error) => {
+                    stream.emit('error', err);
                 });
             }
         }
@@ -65,7 +65,7 @@ export function spawnExternalProcessDuplex(cmd: string): NodeJS.ReadWriteStream 
     const stdin = new PassThrough();
     const stdout = new PassThrough();
 
-    const proc = spawn("bash", ["-c", cmd]);
+    const proc = spawn('bash', ['-c', cmd]);
 
     stdin.pipe(proc.stdin);
 
@@ -78,16 +78,16 @@ export function spawnExternalProcessDuplex(cmd: string): NodeJS.ReadWriteStream 
 }
 
 export function spawnExternalProcessSource(cmd: string, opts?: SpawnOptionsWithoutStdio): Readable {
-    const proc = spawn("bash", ["-c", cmd], opts);
+    const proc = spawn('bash', ['-c', cmd], opts);
 
     const stdout = new PassThrough();
 
-    stdout.on("pause", () => {
-        proc.stdout.pause();
-    });
-    stdout.on("resume", () => {
-        proc.stdout.resume();
-    });
+    // stdout.on("pause", () => {
+    //     proc.stdout.pause();
+    // });
+    // stdout.on("resume", () => {
+    //     proc.stdout.resume();
+    // });
     proc.stdout.pipe(stdout);
     return stdout;
 }

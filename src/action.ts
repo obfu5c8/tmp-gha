@@ -1,9 +1,9 @@
-import * as github from "@actions/github";
-import { ActionInputs, getConfigFromActionInputs } from "./action-inputs";
-import { spawnBashCommand } from "./runner";
-import { LabelledPromiseWaitier } from "./util/promises";
-import { generateSummary } from "./formatters/summary-formatter";
-import { streamFormattedResultsToStdout } from "./formatters/cli-formatter";
+import { ActionInputs, getConfigFromActionInputs } from './action-inputs';
+import { streamFormattedResultsToStdout } from './formatters/cli-formatter';
+import { generateSummary } from './formatters/summary-formatter';
+import { spawnBashCommand } from './runner';
+import { LabelledPromiseWaitier } from './util/promises';
+import { createFileSink } from './util/stream-helpers';
 
 export async function executeAction(inputs: ActionInputs) {
     //==< Generate config from inputs >=============================|
@@ -18,32 +18,35 @@ export async function executeAction(inputs: ActionInputs) {
     });
 
     //==< Pipe test output to file >================================|
-    // if (config.jsonOutputFile) {
-    //     const fileSink = createFileSink(config.jsonOutputFile)
-    //     testRunner.stdout.pipe(fileSink)
-    //     bgTasks.add('filesink', fileSink)
-    // }
+    if (config.jsonOutputFile) {
+        const fileSink = createFileSink(config.jsonOutputFile);
+        testRunner.stdout.pipe(fileSink);
+        bgTasks.add('filesink', fileSink);
+    }
 
     //==< Write full results to stdout >============================|
-    bgTasks.add("cli", streamFormattedResultsToStdout(testRunner.stdout, config));
+    bgTasks.add('cli', streamFormattedResultsToStdout(testRunner.stdout, config));
 
     //==< Capture summary markdown as a string >====================|
-    bgTasks.add("summary", generateSummary(testRunner.stdout, config));
+    bgTasks.add('summary', generateSummary(testRunner.stdout, config));
 
     //==< Start the pipeline >======================================|
     const testRunnerPromise = testRunner.execute();
-    bgTasks.add("testrunner", testRunnerPromise);
+    bgTasks.add('testrunner', testRunnerPromise);
 
     //==< Wait for pipeline to complete >===========================|
     // const results = await Promise.all(thingsToWaitFor)
+
+    /* eslint-disable no-console */
     try {
         const results = await bgTasks.wait();
-        console.error("DONE DONE DINE");
-        console.error("%s", results.summary);
+        console.error('DONE DONE DINE');
+        console.error('%s', results.summary);
         console.error(results);
     } catch (err) {
-        console.error("I GOT ERRORZ", err);
+        console.error('I GOT ERRORZ', err);
     }
+    /* eslint-enable no-console */
 
     //==< Configure the github client >=================|
     // const gh = github.getOctokit(config.githubToken, {

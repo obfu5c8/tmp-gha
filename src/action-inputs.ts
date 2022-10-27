@@ -1,46 +1,41 @@
-import * as core from "@actions/core"
-import { Config } from "./config"
+import * as core from '@actions/core';
+
+import { Config } from './config';
 
 export interface ActionInputs {
-
     /** Directory to execute test command in */
-    dir?: string
+    dir?: string;
 
     /** Command to execute to generate test results. */
-    testCmd?: string
+    testCmd?: string;
 
     /** Display name for test run */
-    name?: string
+    name?: string;
 
     /** Github auth token */
-    token: string
+    token: string;
 
     /** Optional file path to write json test output to */
-    outputJson?: string
+    outputJson?: string;
 
     /** Amount of detail to show in summary */
-    summarize?: string
+    summarize?: string;
 }
-
-
 
 export function getActionInputs(): ActionInputs {
     return {
-        dir: core.getInput("dir"),
+        dir: core.getInput('dir'),
         testCmd: core.getInput('testCmd'),
         name: core.getInput('name'),
         token: core.getInput('token'),
         outputJson: core.getInput('outputJson'),
         summarize: core.getInput('summarize'),
-    }
+    };
 }
 
-
-
 export function getConfigFromActionInputs(inp: ActionInputs): Config {
-    
-    if ( !['all','failed','not-passed'].includes(inp.summarize || 'all')) {
-        throw new Error(`Unrecognised summarize value: '${inp.summarize}'`)
+    if (!['all', 'failed', 'not-passed'].includes(inp.summarize || 'all')) {
+        throw new Error(`Unrecognised summarize value: '${inp.summarize || 'undefined'}'`);
     }
 
     const config: Config = {
@@ -49,19 +44,17 @@ export function getConfigFromActionInputs(inp: ActionInputs): Config {
         testDir: inp.dir || process.cwd(),
         testCmd: 'go test -v -json ./...',
         jsonOutputFile: inp.outputJson,
-        summaryDetail: inp.summarize as Config["summaryDetail"],
-    }
+        summaryDetail: inp.summarize as Config['summaryDetail'],
+    };
 
     // Allow overriding the testCmd, or build it from inputs
     if (inp.testCmd) {
-        config.testCmd = inp.testCmd
+        config.testCmd = inp.testCmd;
     } else {
-        const args = [
-            'go', 'test', '-v', '-json'
-        ]
+        const args = ['go', 'test', '-v', '-json'];
 
-        config.testCmd = [...args, './...'].join(' ')
+        config.testCmd = [...args, './...'].join(' ');
     }
 
-    return config
+    return config;
 }

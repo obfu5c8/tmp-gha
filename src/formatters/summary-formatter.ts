@@ -1,8 +1,8 @@
-import { pipeline, Readable } from "stream";
-import { Config } from "../config";
-import { gotestfmtArgs, spawnGotestfmt } from "../util/gotestfmt";
-import { asyncPipeline, createStringSink, spawnStreamDuplex } from "../util/stream-helpers";
-import { spawnChildProcessDuplex } from "../util/streams/child-process-streams";
+import { Readable } from 'stream';
+
+import { Config } from '../config';
+import { gotestfmtArgs, spawnGotestfmt } from '../util/gotestfmt';
+import { asyncPipeline, createStringSink } from '../util/stream-helpers';
 
 export async function generateSummary(source: Readable, config: Config) {
     // Spawn the gotestfmt process to parse the stream
@@ -21,15 +21,15 @@ export async function generateSummary(source: Readable, config: Config) {
 
 function buildGotestfmtArgs(config: Config): gotestfmtArgs {
     const args: gotestfmtArgs = {
-        ci: "gfm",
+        ci: 'gfm',
     };
 
     switch (config.summaryDetail) {
-        case "failed":
-            args.hide = "all";
+        case 'failed':
+            args.hide = 'all';
             break;
-        case "not-passed":
-            args.hide = "successful-tests,successful-packages";
+        case 'not-passed':
+            args.hide = 'successful-tests,successful-packages';
     }
 
     return args;

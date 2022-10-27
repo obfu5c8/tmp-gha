@@ -1,20 +1,15 @@
-import {
-    ChildProcessWithoutNullStreams,
-    spawn,
-    SpawnOptionsWithoutStdio,
-} from "child_process";
-import {
-    Duplex,
-    PassThrough,
-    Readable,
-    TransformOptions,
-    Writable,
-} from "stream";
+import { ChildProcessWithoutNullStreams, spawn, SpawnOptionsWithoutStdio } from 'child_process';
+import { Duplex, PassThrough, Readable, TransformOptions, Writable } from 'stream';
 
 type ExternalProcessDuplexOptions = TransformOptions & {
     killSignal?: number;
 };
 
+/* eslint-disable  --
+    This class is ported from some vanilla-js and as such is a bit... frisky.
+    I'll probably end up deleting this class anyway, so ignore the linter
+    freakouts for now
+*/
 export class ExternalProcessDuplex extends Duplex {
     constructor(private readonly _options?: ExternalProcessDuplexOptions) {
         super(_options);
@@ -54,10 +49,7 @@ export class ExternalProcessDuplex extends Duplex {
     //==> Delegate the streamy stuff
     //=============================================<
 
-    pipe<T extends NodeJS.WritableStream>(
-        destination: T,
-        options?: { end?: boolean | undefined } | undefined
-    ): T {
+    pipe<T extends NodeJS.WritableStream>(destination: T, options?: { end?: boolean | undefined } | undefined): T {
         return this._reader.pipe(destination, options);
     }
 
@@ -77,17 +69,9 @@ export class ExternalProcessDuplex extends Duplex {
 
     end(cb?: (() => void) | undefined): this;
     end(chunk: any, cb?: (() => void) | undefined): this;
-    end(
-        chunk: any,
-        encoding?: BufferEncoding | undefined,
-        cb?: (() => void) | undefined
-    ): this;
+    end(chunk: any, encoding?: BufferEncoding | undefined, cb?: (() => void) | undefined): this;
     end(chunk?: unknown, encoding?: unknown, cb?: unknown): this {
-        this._reader.end(
-            chunk,
-            encoding as BufferEncoding | undefined,
-            cb as (() => void) | undefined
-        );
+        this._reader.end(chunk, encoding as BufferEncoding | undefined, cb as (() => void) | undefined);
         return this;
     }
 
@@ -96,10 +80,7 @@ export class ExternalProcessDuplex extends Duplex {
         encoding?: BufferEncoding | undefined,
         cb?: ((error: Error | null | undefined) => void) | undefined
     ): boolean;
-    write(
-        chunk: any,
-        cb?: ((error: Error | null | undefined) => void) | undefined
-    ): boolean;
+    write(chunk: any, cb?: ((error: Error | null | undefined) => void) | undefined): boolean;
     write(chunk: unknown, encoding?: unknown, cb?: unknown): boolean {
         return this._writer.write(
             chunk,
@@ -169,12 +150,11 @@ export class ExternalProcessDuplex extends Duplex {
         } else {
             // Everything else
             const ex = (this._ex = new ProcessError(
-                "Command failed: " +
-                    Buffer.concat(this._stderrChunks).toString("utf8")
+                "Command failed: " + Buffer.concat(this._stderrChunks).toString("utf8")
             ));
             ex.killed = this._process!.killed || this._killed;
             ex.code = code;
-            ex.signal = signal;
+            ex.signal = signal; // eslint-disable-line
             this.emit("error", ex);
             this.emit("close");
         }
@@ -193,9 +173,7 @@ export class ExternalProcessDuplex extends Duplex {
         this._killed = true;
 
         try {
-            this._process!.kill(
-                (this._options && this._options.killSignal) || "SIGTERM"
-            );
+            this._process!.kill((this._options && this._options.killSignal) || "SIGTERM");
         } catch (err) {
             this._ex = err;
             this._onExit();

@@ -1,4 +1,4 @@
-import { spawnChildProcessDuplex } from "./streams/child-process-streams";
+import { spawnChildProcessDuplex } from './streams/child-process-streams';
 
 export interface gotestfmtArgs {
     ci?: string;
@@ -12,25 +12,25 @@ export function spawnGotestfmt(opts: gotestfmtArgs = {}): NodeJS.ReadWriteStream
     const args: string[] = [];
 
     if (opts.ci) {
-        args.push("-ci", opts.ci);
+        args.push('-ci', opts.ci);
     }
     if (opts.formatter) {
-        args.push("-formatter", opts.formatter);
+        args.push('-formatter', opts.formatter);
     }
     if (opts.hide) {
-        args.push("-hide", opts.hide);
+        args.push('-hide', opts.hide);
     }
     if (opts.noFail) {
-        args.push("-nofail");
+        args.push('-nofail');
     }
     if (opts.showTestStatus) {
-        args.push("-showteststatus");
+        args.push('-showteststatus');
     }
 
-    return spawnChildProcessDuplex("gotestfmt", args, {
+    return spawnChildProcessDuplex('gotestfmt', args, {
         onNonZeroExit(code, stderr, throwErr) {
             if (code >= 2) {
-                throwErr(new Error("gotestfmt error: " + stderr));
+                throwErr(new Error('gotestfmt error: ' + stderr));
             }
         },
     });
