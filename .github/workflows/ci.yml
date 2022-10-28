@@ -1,0 +1,25 @@
+name: CI
+on: push
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install deps and build
+        run: |
+          yarn install --immutable
+          yarn build
+
+      - name: Test the action
+        uses: ./
+        with:
+          name: My Test Run
+          dir: ./example
+          token: ${{ secrets.GITHUB_TOKEN }}

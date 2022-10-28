@@ -1,19 +1,26 @@
 import { spawn, SpawnOptionsWithoutStdio } from 'child_process';
 import duplexer2 from 'duplexer2';
-import { PassThrough, Readable } from 'stream';
+import { PassThrough } from 'stream';
 
 type ChildProcessStreamOpts = SpawnOptionsWithoutStdio & {
     onNonZeroExit?: (code: number, stderr: string, throwErr: (err: Error) => void) => void;
 };
 
 export function spawnChildProcessDuplex(cmd: string): NodeJS.ReadWriteStream;
-export function spawnChildProcessDuplex(cmd: string, opts: ChildProcessStreamOpts): NodeJS.ReadWriteStream;
+export function spawnChildProcessDuplex(
+    cmd: string,
+    opts: ChildProcessStreamOpts
+): NodeJS.ReadWriteStream;
 export function spawnChildProcessDuplex(
     cmd: string,
     args: string[],
     opts?: ChildProcessStreamOpts
 ): NodeJS.ReadWriteStream;
-export function spawnChildProcessDuplex(cmd: string, arg1?: unknown, arg2?: unknown): NodeJS.ReadWriteStream {
+export function spawnChildProcessDuplex(
+    cmd: string,
+    arg1?: unknown,
+    arg2?: unknown
+): NodeJS.ReadWriteStream {
     // Gather variadic function arguments
     let args: string[] = [];
     let opts: ChildProcessStreamOpts;
@@ -59,35 +66,4 @@ export function spawnChildProcessDuplex(cmd: string, arg1?: unknown, arg2?: unkn
     });
 
     return stream;
-}
-
-export function spawnExternalProcessDuplex(cmd: string): NodeJS.ReadWriteStream {
-    const stdin = new PassThrough();
-    const stdout = new PassThrough();
-
-    const proc = spawn('bash', ['-c', cmd]);
-
-    stdin.pipe(proc.stdin);
-
-    proc.stdout.pipe(stdout);
-    proc.stderr.pipe(stdout);
-
-    const stream = duplexer2(stdin, stdout);
-
-    return stream;
-}
-
-export function spawnExternalProcessSource(cmd: string, opts?: SpawnOptionsWithoutStdio): Readable {
-    const proc = spawn('bash', ['-c', cmd], opts);
-
-    const stdout = new PassThrough();
-
-    // stdout.on("pause", () => {
-    //     proc.stdout.pause();
-    // });
-    // stdout.on("resume", () => {
-    //     proc.stdout.resume();
-    // });
-    proc.stdout.pipe(stdout);
-    return stdout;
 }

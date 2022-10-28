@@ -1,10 +1,10 @@
 import { Config } from './config';
-import { streamFormattedResultsToStdout } from './formatters/cli-formatter';
-import { generateSummary } from './formatters/summary-formatter';
-import { countTestResults, TestResultTotals } from './formatters/test-counter';
-import { spawnBashCommand } from './runner';
-import { LabelledPromiseWaitier } from './util/promises';
-import { createFileSink } from './util/stream-helpers';
+import { streamFormattedResultsToStdout } from './processors/cli-formatter';
+import { streamJsonToFile } from './processors/stream-json-to-file';
+import { generateSummary } from './processors/summary-formatter';
+import { calculateTotals, TestResultTotals } from './processors/test-counter';
+import { promiseMapAll } from './util/promises';
+import { spawnChild } from './util/streams';
 
 interface testOutput {
     passed: boolean;
@@ -13,49 +13,31 @@ interface testOutput {
 }
 
 export async function runTests(config: Config): Promise<testOutput> {
-    //==< Collect all the async stuff to wait for  >================|
-    const bgTasks = new LabelledPromiseWaitier();
-
-    //==< Set up the test runner >==================================|
-    const testRunner = spawnBashCommand(config.testCmd, {
+    //==< Set up the test runner >=====================================|
+    const testRunner = spawnChild('bash', ['-c', config.testCmd], {
         cwd: config.testDir,
+        onExit(code, signal) {
+            if (code && code > 1) {
+                return new Error(`Bad exit code ${code}`);
+            }
+        },
     });
 
-    //==< Pipe test output to file >================================|
-    if (config.jsonOutputFile) {
-        const fileSink = createFileSink(config.jsonOutputFile);
-        testRunner.pipe(fileSink);
-        bgTasks.add('filesink', fileSink);
-    }
-
-    //==< Calculate totals >============================|
-    bgTasks.add('totals', countTestResults(testRunner.stdout, config));
-
-    //==< Write full results to stdout >============================|
-    bgTasks.add('cli', streamFormattedResultsToStdout(testRunner.stdout, config));
-
-    //==< Capture summary markdown as a string >====================|
-    bgTasks.add('summary', generateSummary(testRunner.stdout, config));
-
-    //==< Start the pipeline >======================================|
-    const testRunnerPromise = testRunner.execute();
-    bgTasks.add('testrunner', testRunnerPromise);
-
-    //==< Wait for pipeline to complete >===========================|
-    // const results = await Promise.all(thingsToWaitFor)
-
-    /* eslint-disable no-console */
-    const results = (await bgTasks.wait()) as {
-        testrunner: {
-            code: number;
-        };
-        totals: TestResultTotals;
-        summary: string;
-    };
+    //==< Run our processing pipelines >===============================|
+    const results = await promiseMapAll({
+        // Format the full results output and pipe to stdout
+        cli: streamFormattedResultsToStdout(testRunner, config),
+        // Generate a summary as markdown to use later
+        summary: generateSummary(testRunner, config),
+        // Calculate totals & pass rates for the run
+        totals: calculateTotals(testRunner, config),
+        // Stream raw test result json to a file
+        jsonFile: !!config.jsonOutputFile && streamJsonToFile(testRunner, config.jsonOutputFile),
+    });
 
     return {
-        passed: results.testrunner.code === 0,
-        summary: results.summary,
+        passed: results.totals.passed == results.totals.total - results.totals.skipped,
         totals: results.totals,
+        summary: results.summary,
     };
 }

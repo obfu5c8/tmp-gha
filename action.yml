@@ -33,15 +33,6 @@ inputs:
     required: false
     default: all
 
-  packages:
-    description: 'Packages to run'
-    required: false
-    default: './...'
-
-  coverage:
-    description: Calculate test coverage
-    default: 'false'
-
   token:
     description: github token
     required: true

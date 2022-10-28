@@ -1,58 +1,53 @@
+import * as github from '@actions/github';
+import { green, red } from 'ansi-colors';
+
 import { ActionInputs, getConfigFromActionInputs } from './action-inputs';
+import { GithubCheckRun } from './github/checks';
 import { runTests } from './test-runner';
+import { log } from './util/log';
 
 export async function executeAction(inputs: ActionInputs) {
     //==< Generate config from inputs >=============================|
     const config = getConfigFromActionInputs(inputs);
 
-    try {
-        const results = await runTests(config);
+    //==< Configure the github client >=============================|
+    const gh = github.getOctokit(config.githubToken, {
+        userAgent: 'wetransfer/gh-action-go-test',
+    });
 
-        console.log('hello stdout!');
-        console.error(results);
-    } catch (err) {
-        console.error('Failed to run tests:', err);
+    //==< Mark the test check as starting >=========================|
+    const check = GithubCheckRun.fromContext(gh, config.displayName, github.context);
+    await check.start();
+
+    //==< Execute test run & gather the results >===================|
+    log.info('Running tests with: %s\n', config.testCmd);
+    const results = await runTests(config);
+
+    //==< Print a high-level summary to console >===================|
+    if (results.passed) {
+        console.log(PASS);
+    } else {
+        console.log(FAIL);
     }
 
-    /* eslint-enable no-console */
-
-    //==< Configure the github client >=================|
-    // const gh = github.getOctokit(config.githubToken, {
-    //     userAgent: 'wetransfer/gh-action-go-test'
-    // })
-    //
-
-    //==< Mark the test check as starting >=================|
-    // const check = await gh.rest.checks.create({
-    //     owner: github.context.repo.owner,
-    //     repo: github.context.repo.repo,
-    //     name: config.displayName,
-    //     head_sha: github.context.sha,
-    //     status: 'in_progress',
-    //     started_at: new Date().toISOString(),
-    // })
-
-    //==< Run the tests & collect the output >==============|
-    // const results = await executeTests({
-    //     pwd,
-    //     runName,
-    //     goTestArgs,
-    //     githubToken,
-    // })
-
-    //==< Mark the check as complete >=================|
-    // await gh.rest.checks.update({
-    //     owner: github.context.repo.owner,
-    //     repo: github.context.repo.repo,
-    //     check_run_id: check.data.id,
-
-    //     status: 'completed',
-    //     completed_at: new Date().toISOString(),
-    //     conclusion: 'neutral',
-    //     output: {
-    //         title: runName,
-    //         summary: "Some tests were run",
-    //         text: results.summary
-    //     }
-    // })
+    //==< Mark the check as complete >==============================|
+    await check.complete(results.summary);
 }
+
+const PASS = green(`
+    ██████╗  █████╗ ███████╗███████╗
+    ██╔══██╗██╔══██╗██╔════╝██╔════╝
+    ██████╔╝███████║███████╗███████╗
+    ██╔═══╝ ██╔══██║╚════██║╚════██║
+    ██║     ██║  ██║███████║███████║
+    ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝
+`);
+
+const FAIL = red(`
+    ███████╗ █████╗ ██╗██╗
+    ██╔════╝██╔══██╗██║██║
+    █████╗  ███████║██║██║
+    ██╔══╝  ██╔══██║██║██║
+    ██║     ██║  ██║██║███████╗
+    ╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝
+`);

@@ -2,21 +2,20 @@ import { Readable } from 'stream';
 
 import { Config } from '../config';
 import { gotestfmtArgs, spawnGotestfmt } from '../util/gotestfmt';
-import { asyncPipeline, createStringSink } from '../util/stream-helpers';
+import { asyncPipeline, stringSink } from '../util/streams';
 
-export async function generateSummary(source: Readable, config: Config) {
+export async function generateSummary(source: Readable, config: Config): Promise<string> {
     // Spawn the gotestfmt process to parse the stream
-
     const gotestfmt = spawnGotestfmt(buildGotestfmtArgs(config));
 
     // Create a string sink to capture the output
-    const stringSink = createStringSink();
+    const sink = stringSink();
 
     // Execute the pipeline
-    await asyncPipeline(source, gotestfmt, stringSink);
+    await asyncPipeline(source, gotestfmt, sink);
 
     // Resolve with the captured string
-    return stringSink.value;
+    return await sink.value;
 }
 
 function buildGotestfmtArgs(config: Config): gotestfmtArgs {

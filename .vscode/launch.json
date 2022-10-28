@@ -8,12 +8,11 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
+            "skipFiles": ["<node_internals>/**"],
             "runtimeExecutable": "yarn",
             "args": ["ts-node", "./src/local.ts"],
-           
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal"
         }
     ]
 }
