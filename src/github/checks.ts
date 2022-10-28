@@ -52,6 +52,8 @@ export class GithubCheckRun {
 
             const title = `${this.name} - `;
 
+            const summary = generateSummaryMarkdown(results);
+
             await this.gh.rest.checks.update({
                 ...this.repo,
                 check_run_id: this.checkId,
@@ -60,7 +62,7 @@ export class GithubCheckRun {
                 conclusion,
                 output: {
                     title: this.name,
-                    summary: 'Some tests were run',
+                    summary,
                     text: results.summary,
                 },
             });
@@ -69,6 +71,25 @@ export class GithubCheckRun {
         }
     }
 }
+
+const generateSummaryMarkdown = (results: TestOutput) => {
+    const passed = results.totals.passed;
+    const failed = results.totals.total - results.totals.passed - results.totals.skipped;
+    const skipped = results.totals.skipped;
+    const total = results.totals.total;
+    const totalNotSkipped = total - skipped;
+    const passPc = Math.round((passed / totalNotSkipped) * 100);
+    const failPc = Math.round((failed / totalNotSkipped) * 100);
+
+    return `
+|  |  |  | |
+|---|--| :--: | :--: |
+| ✅ | Passed | ${passed} | ${passPc}% |
+| ❌ | Failed | ${failed} | ${failPc}% |
+| 🚧 | Skipped | ${skipped} |  |
+|    | **Total** |  **${total}** |  |
+`;
+};
 
 function wrapError<T>(name: string, err: T): T {
     if (err instanceof Error) {
