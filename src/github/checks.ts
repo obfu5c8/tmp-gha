@@ -34,7 +34,8 @@ export class GithubCheckRun {
                 started_at: new Date().toISOString(),
             });
 
-            return check.data.id;
+            this.checkId = check.data.id;
+            return check.data;
         } catch (err: any) {
             throw wrapError('Failed to start check', err);
         }
