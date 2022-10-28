@@ -81,14 +81,18 @@ const generateSummaryMarkdown = (results: TestOutput) => {
     const passPc = Math.round((passed / totalNotSkipped) * 100);
     const failPc = Math.round((failed / totalNotSkipped) * 100);
 
-    return `
-|  |  |  | |
-|---|--| :--: | :--: |
-| ✅ | Passed | ${passed} | ${passPc}% |
-| ❌ | Failed | ${failed} | ${failPc}% |
-| 🚧 | Skipped | ${skipped} |  |
-|    | **Total** |  **${total}** |  |
-`;
+    const lines: string[] = [];
+    if (passed > 0) {
+        lines.push(`### ✅ ${passPc}% Passed <sup>(${passed}/${totalNotSkipped})</sup>`);
+    }
+    if (failed > 0) {
+        lines.push(`### ❌ ${failPc}% Failed <sup>(${failed}/${totalNotSkipped})</sup>`);
+    }
+    if (skipped > 0) {
+        lines.push(`#### 🚧 ${skipped}% tests skipped`);
+    }
+
+    return lines.join('\n');
 };
 
 function wrapError<T>(name: string, err: T): T {
