@@ -28,6 +28,6 @@ jobs:
       - name: Test the action
         uses: ./
         with:
-          name: My Test Run
+          name: Example Unit Tests
           dir: ./example
           token: ${{ secrets.GITHUB_TOKEN }}
