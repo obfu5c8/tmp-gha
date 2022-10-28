@@ -29,9 +29,9 @@ inputs:
   summarize:
     description: |
       Level of detail to show in summary. Can be one of [ all | failed | not-passed ]. 
-      Defaults to 'all'
+      Defaults to 'failed'
     required: false
-    default: all
+    default: failed
 
   token:
     description: github token
