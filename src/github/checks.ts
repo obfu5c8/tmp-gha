@@ -89,7 +89,7 @@ const generateSummaryMarkdown = (results: TestOutput) => {
         lines.push(`### ❌ ${failPc}% Failed <sup>(${failed}/${totalNotSkipped})</sup>`);
     }
     if (skipped > 0) {
-        lines.push(`#### 🚧 ${skipped}% tests skipped`);
+        lines.push(`#### 🚧 ${skipped} test${skipped > 1 ? 's' : ''} skipped`);
     }
 
     return lines.join('\n');
