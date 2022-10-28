@@ -1,12 +1,12 @@
 import { Readable } from 'stream';
 
 import { Config } from '../config';
-import { gotestfmtArgs, spawnGotestfmt } from '../util/gotestfmt';
+import { gotestfmtArgs, streamGotestfmt } from '../util/gotestfmt';
 import { asyncPipeline, stringSink } from '../util/streams';
 
 export async function generateSummary(source: Readable, config: Config): Promise<string> {
     // Spawn the gotestfmt process to parse the stream
-    const gotestfmt = spawnGotestfmt(buildGotestfmtArgs(config));
+    const gotestfmt = streamGotestfmt(buildGotestfmtArgs(config));
 
     // Create a string sink to capture the output
     const sink = stringSink();

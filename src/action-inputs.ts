@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import * as github from '@actions/github';
 
 import { Config } from './config';
 
@@ -45,6 +46,8 @@ export function getConfigFromActionInputs(inp: ActionInputs): Config {
         testCmd: 'go test -v -json ./...',
         jsonOutputFile: inp.outputJson,
         summaryDetail: inp.summarize as Config['summaryDetail'],
+        githubRepo: github.context.repo,
+        githubSha: github.context.sha,
     };
 
     // Allow overriding the testCmd, or build it from inputs
@@ -52,7 +55,6 @@ export function getConfigFromActionInputs(inp: ActionInputs): Config {
         config.testCmd = inp.testCmd;
     } else {
         const args = ['go', 'test', '-v', '-json'];
-
         config.testCmd = [...args, './...'].join(' ');
     }
 

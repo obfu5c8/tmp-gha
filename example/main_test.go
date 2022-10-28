@@ -1,7 +1,9 @@
 package main
 
-import "testing"
-import "fmt"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestMain(t *testing.T) {
 
@@ -15,7 +17,7 @@ func Test_SomethingElse(t *testing.T) {
 func Test_Nested(t *testing.T) {
 
 	t.Run("nested test 1", func(t *testing.T) {
-
+		main()
 	})
 
 	t.Run("nested test 2", func(t *testing.T) {

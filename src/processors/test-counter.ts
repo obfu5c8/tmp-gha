@@ -23,7 +23,7 @@ export interface TestResultTotals extends resultCounter {
 
 type gotestfmtevent = { Action: string; Package: string; Output?: string };
 
-export async function calculateTotals(source: Readable, config: Config): Promise<TestResultTotals> {
+export async function calculateTotals(source: Readable, _: Config): Promise<TestResultTotals> {
     const reducer = reducerSink<TestResultTotals, gotestfmtevent>(testCountReducer, {
         total: 0,
         passed: 0,
@@ -33,9 +33,6 @@ export async function calculateTotals(source: Readable, config: Config): Promise
     });
 
     const jsonParser = es.parse({ error: true });
-    jsonParser.on('error', (err) => {
-        console.error('ERROR IN JSON PARSER:', err);
-    });
 
     // If first message is 'output' action, there's probably been an error
     let isFirst = true;

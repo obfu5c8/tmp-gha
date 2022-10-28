@@ -1,12 +1,13 @@
 import * as core from '@actions/core';
 
 import { executeAction } from './action';
-import { getActionInputs } from './action-inputs';
+import { getActionInputs, getConfigFromActionInputs } from './action-inputs';
 
 (async function main() {
     try {
         const inputs = getActionInputs();
-        await executeAction(inputs);
+        const config = getConfigFromActionInputs(inputs);
+        await executeAction(config);
     } catch (err: any) {
         if (err instanceof Error || typeof err === 'string') {
             core.setFailed(err);

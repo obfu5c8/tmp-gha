@@ -1,37 +1,41 @@
-import * as github from '@actions/github';
-import { green, red } from 'ansi-colors';
+import { cyan, green, red } from 'ansi-colors';
 
-import { ActionInputs, getConfigFromActionInputs } from './action-inputs';
+import { Config } from './config';
+import { GithubClient } from './github';
 import { GithubCheckRun } from './github/checks';
+import { getGithubClient } from './github/client';
 import { runTests } from './test-runner';
 import { log } from './util/log';
 
-export async function executeAction(inputs: ActionInputs) {
-    //==< Generate config from inputs >=============================|
-    const config = getConfigFromActionInputs(inputs);
-
+export async function executeAction(config: Config) {
     //==< Configure the github client >=============================|
-    const gh = github.getOctokit(config.githubToken, {
-        userAgent: 'wetransfer/gh-action-go-test',
-    });
+    let gh: GithubClient | undefined;
+    if (!config.skipGithub) {
+        gh = getGithubClient(config.githubToken);
+    }
 
     //==< Mark the test check as starting >=========================|
-    const check = GithubCheckRun.fromContext(gh, config.displayName, github.context);
-    await check.start();
+    let check: GithubCheckRun | undefined = undefined;
+    if (gh) {
+        check = GithubCheckRun.fromConfig(gh, config);
+        await check.start();
+    }
 
     //==< Execute test run & gather the results >===================|
-    log.info('Running tests with: %s\n', config.testCmd);
+    log.info('Running tests with: %s\n', cyan(config.testCmd));
     const results = await runTests(config);
 
     //==< Print a high-level summary to console >===================|
     if (results.passed) {
-        console.log(PASS);
+        process.stdout.write(PASS + '\n');
     } else {
-        console.log(FAIL);
+        process.stdout.write(FAIL + '\n');
     }
 
     //==< Mark the check as complete >==============================|
-    await check.complete(results);
+    if (gh && check) {
+        await check.complete(results);
+    }
 }
 
 const PASS = green(`

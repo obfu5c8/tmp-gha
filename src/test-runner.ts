@@ -16,7 +16,7 @@ export async function runTests(config: Config): Promise<TestOutput> {
     //==< Set up the test runner >=====================================|
     const testRunner = spawnChild('bash', ['-c', config.testCmd], {
         cwd: config.testDir,
-        onExit(code, signal) {
+        onExit(code, _signal) {
             if (code && code > 1) {
                 return new Error(`Bad exit code ${code}`);
             }

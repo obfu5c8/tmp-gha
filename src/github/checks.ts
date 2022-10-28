@@ -1,9 +1,7 @@
-import type { context as ghContext, getOctokit } from '@actions/github';
-
+import { Config } from '../config';
 import { TestOutput } from '../test-runner';
 import { log } from '../util/log';
-
-type githubClient = ReturnType<typeof getOctokit>;
+import { GithubClient } from './types';
 
 type repo = {
     repo: string;
@@ -12,14 +10,14 @@ type repo = {
 
 export class GithubCheckRun {
     constructor(
-        private readonly gh: githubClient,
+        private readonly gh: GithubClient,
         public readonly repo: repo,
         public readonly sha: string,
         public readonly name: string
     ) {}
 
-    static fromContext(gh: githubClient, name: string, context: typeof ghContext): GithubCheckRun {
-        return new GithubCheckRun(gh, context.repo, context.sha, name);
+    static fromConfig(gh: GithubClient, config: Config): GithubCheckRun {
+        return new GithubCheckRun(gh, config.githubRepo, config.githubSha, config.displayName);
     }
 
     private checkId?: number;
@@ -49,9 +47,6 @@ export class GithubCheckRun {
             }
 
             const conclusion = results.passed ? 'success' : 'failure';
-
-            const title = `${this.name} - `;
-
             const summary = generateSummaryMarkdown(results);
 
             await this.gh.rest.checks.update({

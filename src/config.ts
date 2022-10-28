@@ -16,4 +16,13 @@ export interface Config {
 
     /** Amount of detail to show in summary */
     summaryDetail: 'all' | 'failed' | 'not-passed';
+
+    /** If true, skip all github interactions (useful for debugging locally) */
+    skipGithub?: boolean;
+
+    githubRepo: {
+        owner: string;
+        repo: string;
+    };
+    githubSha: string;
 }

@@ -1,14 +1,12 @@
-node_modules
 
+# Dev environment files
 .env
-
 *.log
-
-
 test-output.json
 
 ## Dist
 dist
+lib
 
 # Yarn zero-installs
 .yarn/*
@@ -19,5 +17,11 @@ dist
 !.yarn/sdks
 !.yarn/versions
 
+# Badly-behaved npm module junk
+node_modules
+
 # Typescript build info
 tsconfig.tsbuildinfo
+
+# Mac
+.DS_Store

@@ -9,8 +9,10 @@ export async function streamFormattedResultsToStdout(source: Readable, _: Config
 
     const formatter = streamGotestfmt({
         noFail: true,
-        onExit(code, signal) {
-            console.log('gotestfmt exited with %d', code);
+        onExit(code, _signal) {
+            if (code && code >= 2) {
+                return new Error('gotestfmt error');
+            }
         },
     });
 
