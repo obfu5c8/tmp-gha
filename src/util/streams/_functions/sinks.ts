@@ -83,7 +83,7 @@ export const stringSink = (): ValueSink<string> => {
 
     const valuePromise = new Promise((resolve, reject) => {
         sink.once('finish', () => {
-            resolve(buffer);
+            resolve(buffer.join(''));
         });
         sink.once('error', (err) => {
             reject(err);
