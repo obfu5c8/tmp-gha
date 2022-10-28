@@ -18,3 +18,6 @@ dist
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Typescript build info
+tsconfig.tsbuildinfo

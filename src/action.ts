@@ -31,7 +31,7 @@ export async function executeAction(inputs: ActionInputs) {
     }
 
     //==< Mark the check as complete >==============================|
-    await check.complete(results.summary);
+    await check.complete(results);
 }
 
 const PASS = green(`
