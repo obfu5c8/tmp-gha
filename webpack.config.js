@@ -9,7 +9,7 @@ module.exports = {
         cli: './src/cli.ts',
     },
     output: {
-        path: path.resolve(__dirname, 'lib'),
+        path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
         clean: true,
     },
