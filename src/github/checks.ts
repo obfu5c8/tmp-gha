@@ -1,5 +1,6 @@
 import type { context as ghContext, getOctokit } from '@actions/github';
 
+import { TestOutput } from '../test-runner';
 import { log } from '../util/log';
 
 type githubClient = ReturnType<typeof getOctokit>;
@@ -41,22 +42,24 @@ export class GithubCheckRun {
         }
     }
 
-    async complete(text: string) {
+    async complete(results: TestOutput) {
         try {
             if (this.checkId === undefined) {
                 throw new Error('Check has not yet been started');
             }
+
+            const conclusion = results.passed ? 'success' : 'failure';
 
             await this.gh.rest.checks.update({
                 ...this.repo,
                 check_run_id: this.checkId,
                 status: 'completed',
                 completed_at: new Date().toISOString(),
-                conclusion: 'neutral',
+                conclusion,
                 output: {
                     title: this.name,
                     summary: 'Some tests were run',
-                    text,
+                    text: results.summary,
                 },
             });
         } catch (err) {

@@ -6,13 +6,13 @@ import { calculateTotals, TestResultTotals } from './processors/test-counter';
 import { promiseMapAll } from './util/promises';
 import { spawnChild } from './util/streams';
 
-interface testOutput {
+export interface TestOutput {
     passed: boolean;
     summary: string;
     totals: TestResultTotals;
 }
 
-export async function runTests(config: Config): Promise<testOutput> {
+export async function runTests(config: Config): Promise<TestOutput> {
     //==< Set up the test runner >=====================================|
     const testRunner = spawnChild('bash', ['-c', config.testCmd], {
         cwd: config.testDir,
